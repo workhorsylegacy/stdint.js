@@ -24,11 +24,6 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 */
 
-var HEAP_SIZE = 1024 * 1024;
-var heap = new ArrayBuffer(HEAP_SIZE);
-var heap_counter = 0;
-var scope_counter = 0;
-
 const size_of_s8 = Int8Array.BYTES_PER_ELEMENT;
 const size_of_s16 = Int16Array.BYTES_PER_ELEMENT;
 const size_of_s32 = Int32Array.BYTES_PER_ELEMENT;
@@ -37,21 +32,46 @@ const size_of_u8 = Uint8Array.BYTES_PER_ELEMENT;
 const size_of_u16 = Uint16Array.BYTES_PER_ELEMENT;
 const size_of_u32 = Uint32Array.BYTES_PER_ELEMENT;
 
-const max_s8 = Math.pow(2, (size_of_s8 * 7));
-const max_s16 = Math.pow(2, (size_of_s16 * 7));
-const max_s32 = Math.pow(2, (size_of_s32 * 7));
+const max_s8 = Math.pow(2, (size_of_s8 * 8) - 1) - 1;
+const max_s16 = Math.pow(2, (size_of_s16 * 8) - 1) - 1;
+const max_s32 = Math.pow(2, (size_of_s32 * 8) - 1) - 1;
 
 const max_u8 = Math.pow(2, (size_of_u8 * 8)) - 1;
 const max_u16 = Math.pow(2, (size_of_u16 * 8)) - 1;
 const max_u32 = Math.pow(2, (size_of_u32 * 8)) - 1;
 
-var s8 = new Int8Array(heap);
-var s16 = new Int16Array(heap);
-var s32 = new Int32Array(heap);
+const min_s8 = -Math.pow(2, (size_of_s8 * 8) - 1);
+const min_s16 = -Math.pow(2, (size_of_s16 * 8) - 1);
+const min_s32 = -Math.pow(2, (size_of_s32 * 8) - 1);
 
-var u8 = new Uint8Array(heap);
-var u16 = new Uint16Array(heap);
-var u32 = new Uint32Array(heap);
+const min_u8 = 0;
+const min_u16 = 0;
+const min_u32 = 0;
+
+var HEAP_SIZE = 1024 * 1024;
+var heap_counter = 0;
+var scope_counter = 0;
+var heap;
+
+var s8;
+var s16;
+var s32;
+
+var u8;
+var u16;
+var u32;
+
+function reset_heap() {
+	heap = new ArrayBuffer(HEAP_SIZE);
+
+	s8 = new Int8Array(heap);
+	s16 = new Int16Array(heap);
+	s32 = new Int32Array(heap);
+
+	u8 = new Uint8Array(heap);
+	u16 = new Uint16Array(heap);
+	u32 = new Uint32Array(heap);
+}
 
 function malloc(array, size) {
 	// FIXME: If the heap is too small, the size should be increased.
@@ -82,7 +102,7 @@ function new_u32() { return malloc(u32, size_of_u32); }
 // Also set their values to zero.
 // FIXME: This may break if called in an unexpected order, such as from a timeout or interval.
 function clean_heap() {
-	console.log('Cleaning heap');
+	//console.log('Cleaning heap');
 	while(scope_counter > 0) {
 		heap[heap_counter] = 0;
 		--heap_counter;
@@ -102,4 +122,5 @@ function with_clean_heap(func) {
 	}
 }
 
+reset_heap();
 
