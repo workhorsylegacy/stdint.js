@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" >
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<title>stdint.js</title>
+		<script type="text/javascript" src="stdint.js"></script>
+	</head>
+
+	<body>
+		<button onclick="doit()">do it</button>
+		<script type="text/javascript" language="JavaScript">
+function domore() {
+	var x = new_u8();
+	console.log(u8[x]);
+	u8[x] = 55;
+	console.log(u8[x]);
+}
+
+function doit() {
+	var a = new_u8();
+	console.log(u8[a]);
+	u8[a] = 2;
+	console.log(u8[a]);
+
+	domore();
+
+	var z = new_u8();
+	console.log(u8[z]);
+	u8[z] = 255;
+	console.log(u8[z]);
+	u8[z] += 10;
+	console.log(u8[z]);
+
+	var y = u8[z] + 5;
+	console.log(y);
+}
+
+// Use scope guard to auto clean the heap when the functions exit
+domore = with_clean_heap(domore);
+doit = with_clean_heap(doit);
+
+		</script>
+	</body>
+</html>
