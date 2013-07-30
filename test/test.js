@@ -173,7 +173,7 @@ test( "s32", function() {
 });
 
 test( "heap cleanup", function() {
-	function example() {
+	example = uses_stdint(function() {
 		// Make sure the id is correct
 		var a = new_u8();
 		u8[a] = 4;
@@ -191,10 +191,9 @@ test( "heap cleanup", function() {
 		// Make sure the heap counter is correct
 		equal(heap_counter, 2);
 		equal(scope_counter, 2);
-	}
+	});
 
 	// Actually call the function
-	example = with_clean_heap(example);
 	example();
 
 	// Make sure the values are gone off the heap

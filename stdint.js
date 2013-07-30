@@ -115,7 +115,7 @@ function clean_heap() {
 
 // Returns a new function that calls the original, then cleans the heap when it exits.
 // It uses a try/finally block for a scope guard.
-function with_clean_heap(func) {
+function uses_stdint(func) {
 	return function() {
 		try {
 			return func.apply(this, arguments);

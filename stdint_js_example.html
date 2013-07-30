@@ -10,14 +10,14 @@
 	<body>
 		<button onclick="doit()">do it</button>
 		<script type="text/javascript" language="JavaScript">
-function domore() {
+domore = uses_stdint(function() {
 	var x = new_u8();
 	console.log(u8[x]);
 	u8[x] = 55;
 	console.log(u8[x]);
-}
+});
 
-function doit() {
+doit = uses_stdint(function() {
 	var a = new_u8();
 	console.log(u8[a]);
 	u8[a] = 2;
@@ -34,11 +34,7 @@ function doit() {
 
 	var y = u8[z] + 5;
 	console.log(y);
-}
-
-// Use scope guard to auto clean the heap when the functions exit
-domore = with_clean_heap(domore);
-doit = with_clean_heap(doit);
+});
 
 		</script>
 	</body>
