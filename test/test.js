@@ -172,4 +172,73 @@ test( "s32", function() {
 	equal( s32[a], -120, "Negative");
 });
 
+test( "heap cleanup", function() {
+	function example() {
+		// Make sure the id is correct
+		var a = new_u8();
+		u8[a] = 4;
+		equal(a, 0);
+
+		// Make sure the id is correct
+		var b = new_u8();
+		u8[b] = 5;
+		equal(b, 1);
+
+		// Make sure the values are on the heap
+		equal(u8[0], 4);
+		equal(u8[1], 5);
+
+		// Make sure the heap counter is correct
+		equal(heap_counter, 2);
+		equal(scope_counter, 2);
+	}
+
+	// Actually call the function
+	example = with_clean_heap(example);
+	example();
+
+	// Make sure the values are gone off the heap
+	equal(u8[0], 0);
+	equal(u8[1], 0);
+
+	// Make sure the heap counter is correct
+	equal(heap_counter, 0);
+	equal(scope_counter, 0);
+});
+
+test( "default value", function() {
+	// No argument should be zero
+	var a = new_u8();
+	equal(u8[a], 0);
+
+	// An argument should be set
+	var b = new_u8(9);
+	equal(u8[b], 9);
+});
+
+test( "union", function() {
+	// Create a u32
+	var a = new_u32();
+	u32[a] = max_u32;
+
+	// Make sure the u32 can be read as 4 u8 values
+	equal(u8[0], 255);
+	equal(u8[1], 255);
+	equal(u8[2], 255);
+	equal(u8[3], 255);
+});
+
+test( "casting", function() {
+	// u8 to u32 should work
+	var a = new_u8(7);
+	var b = to_u32(u8[a]);
+	equal(u8[a], 7);
+	equal(u32[b], 7);
+
+	// u32 to u8 should truncate
+	var a = new_u32(300);
+	var b = to_u8(u32[a]);
+	equal(u32[a], 300);
+	equal(u8[b], 44);
+});
 

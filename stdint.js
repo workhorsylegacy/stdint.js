@@ -62,6 +62,9 @@ var u16;
 var u32;
 
 function reset_heap() {
+	heap_counter = 0;
+	scope_counter = 0;
+
 	heap = new ArrayBuffer(HEAP_SIZE);
 
 	s8 = new Int8Array(heap);
@@ -73,30 +76,30 @@ function reset_heap() {
 	u32 = new Uint32Array(heap);
 }
 
-function malloc(array, size) {
+function malloc(array, size, value) {
 	// FIXME: If the heap is too small, the size should be increased.
+	var id = heap_counter;
 	heap_counter += size;
 	scope_counter += size;
-	var id = heap_counter;
-	array[id] = 0;
+	array[id] = value !== 'undefined' ? value : 0;
 	return id;
 }
 
 // Converts an integer to a u8, u16, u32 et cetera
-function to_s8(value) { return value & 0xFF; }
-function to_s16(value) { return value & 0xFFFF; }
-function to_s32(value) { return value & 0xFFFFFFFF; }
-function to_u8(value) { return value & 0xFF; }
-function to_u16(value) { return value & 0xFFFF; }
-function to_u32(value) { return value & 0xFFFFFFFF; }
+function to_s8(value) { return new_s8(value); }
+function to_s16(value) { return new_s16(value); }
+function to_s32(value) { return new_s32(value); }
+function to_u8(value) { return new_u8(value); }
+function to_u16(value) { return new_u16(value); }
+function to_u32(value) { return new_u32(value); }
 
 // Returns a new index that can be used to access a variable on the heap
-function new_s8() { return malloc(s8, size_of_s8); }
-function new_s16() { return malloc(s16, size_of_s16); }
-function new_s32() { return malloc(s32, size_of_s32); }
-function new_u8() { return malloc(u8, size_of_u8); }
-function new_u16() { return malloc(u16, size_of_u16); }
-function new_u32() { return malloc(u32, size_of_u32); }
+function new_s8(value) { return malloc(s8, size_of_s8, value); }
+function new_s16(value) { return malloc(s16, size_of_s16, value); }
+function new_s32(value) { return malloc(s32, size_of_s32, value); }
+function new_u8(value) { return malloc(u8, size_of_u8, value); }
+function new_u16(value) { return malloc(u16, size_of_u16, value); }
+function new_u32(value) { return malloc(u32, size_of_u32, value); }
 
 // Removes any variables from the heap that were declared since the current scope started.
 // Also set their values to zero.
@@ -104,9 +107,9 @@ function new_u32() { return malloc(u32, size_of_u32); }
 function clean_heap() {
 	//console.log('Cleaning heap');
 	while(scope_counter > 0) {
-		heap[heap_counter] = 0;
 		--heap_counter;
 		--scope_counter;
+		u8[heap_counter] = 0;
 	}
 }
 
