@@ -51,7 +51,7 @@ const min_u32 = 0;
 var HEAP_SIZE = 1024 * 1024;
 var heap_counter = 0;
 var scope_counter = 0;
-var heap;
+var gheap;
 
 var s8;
 var s16;
@@ -61,19 +61,64 @@ var u8;
 var u16;
 var u32;
 
+function U8_Heap() {
+	this.heap = new Uint8Array(gheap);
+	this.id_to_name = {};
+
+	Object.defineProperty(this, 'size', {
+		get: function() {
+			return 1;
+		}
+	});
+
+	Object.defineProperty(this, 'min', {
+		get: function() {
+			return 0;
+		}
+	});
+
+	Object.defineProperty(this, 'max', {
+		get: function() {
+			return Math.pow(2, (size_of_u8 * 8)) - 1;
+		}
+	});
+}
+
+U8_Heap.prototype.create = function(name, value) {
+	//FIXME: Throw if the name is already used or a reserved word.
+
+	var id = heap_counter;
+	heap_counter += this.size;
+	scope_counter += this.size;
+	this.heap[id] = value !== 'undefined' ? value : 0;
+	this.id_to_name[id] = name;
+
+	Object.defineProperty(this, name, {
+		configurable : true,
+
+		get: function() {
+			return this.heap[id];
+		},
+
+		set: function(val) {
+			this.heap[id] = val;
+		}
+	});
+};
+
 function reset_heap() {
 	heap_counter = 0;
 	scope_counter = 0;
 
-	heap = new ArrayBuffer(HEAP_SIZE);
+	gheap = new ArrayBuffer(HEAP_SIZE);
 
-	s8 = new Int8Array(heap);
-	s16 = new Int16Array(heap);
-	s32 = new Int32Array(heap);
+	s8 = new Int8Array(gheap);
+	s16 = new Int16Array(gheap);
+	s32 = new Int32Array(gheap);
 
-	u8 = new Uint8Array(heap);
-	u16 = new Uint16Array(heap);
-	u32 = new Uint32Array(heap);
+	u8 = new Uint8Array(gheap);
+	u16 = new Uint16Array(gheap);
+	u32 = new Uint32Array(gheap);
 }
 
 function malloc(array, size, value) {

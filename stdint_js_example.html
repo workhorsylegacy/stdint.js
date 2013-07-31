@@ -36,6 +36,18 @@ doit = uses_stdint(function() {
 	console.log(y);
 });
 
+
+	u8 = new U8_Heap();
+
+	console.log(u8.size);
+	console.log(u8.min);
+	console.log(u8.max);
+
+	u8.create('ass', 7);
+	u8.create('poo', 99);
+	console.log(u8.ass);
+	console.log(u8.poo);
+
 		</script>
 	</body>
 </html>
