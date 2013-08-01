@@ -16,16 +16,22 @@ The following types are supported:
 Example
 -----
 
-    var a = new_u8(5);  // create a new u8 variable with a value of 5
-    u8[a] = 7;          // set it to 7
-    console.log(u8[a]); // get the value and print it
+    // Print sizes of the u8 type
+    console.log('u8 is ' + u8.size + ' byte.');
+    console.log('u8 min is ' + u8.min + '.');
+    console.log('u8 max is ' + u8.max + '.');
+
+    // Create a u8 named 'a' and set and get its value
+    u8.create('a', 5);
+    u8.a = 7;
+    console.log(u8.a);
 
     // Any functions that create variables should be marked with uses_stdint
-    example = uses_stdint(function() {
-        var b = new_u32(3);
-        console.log(u32[b]);
+    var example = uses_stdint(function() {
+        u32.create('b', 3);
+        console.log(u32.b);
     });
 
-    // The variable b will be added to the heap when the function 
-    // starts, then automatically removed when it exits
+    // Thanks to uses_stdint the variable b will be added to the heap when 
+    // the function starts, then automatically removed when it exits.
     example();
