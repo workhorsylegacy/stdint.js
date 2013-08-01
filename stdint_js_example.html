@@ -11,33 +11,30 @@
 		<button onclick="doit()">do it</button>
 		<script type="text/javascript" language="JavaScript">
 domore = uses_stdint(function() {
-	var x = new_u8();
-	console.log(u8[x]);
-	u8[x] = 55;
-	console.log(u8[x]);
+	u8.create('x');
+	console.log(u8.x);
+	u8.x = 55;
+	console.log(u8.x);
 });
 
 doit = uses_stdint(function() {
-	var a = new_u8();
-	console.log(u8[a]);
-	u8[a] = 2;
-	console.log(u8[a]);
+	u8.create('a');
+	console.log(u8.a);
+	u8.a = 2;
+	console.log(u8.a);
 
 	domore();
 
-	var z = new_u8();
-	console.log(u8[z]);
-	u8[z] = 255;
-	console.log(u8[z]);
-	u8[z] += 10;
-	console.log(u8[z]);
+	u8.create('z');
+	console.log(u8.z);
+	u8.z = 255;
+	console.log(u8.z);
+	u8.z += 10;
+	console.log(u8.z);
 
-	var y = u8[z] + 5;
-	console.log(y);
+	u8.create('y', u8.z + 5);
+	console.log(u8.y);
 });
-
-
-	u8 = new U8_Heap();
 
 	console.log(u8.size);
 	console.log(u8.min);

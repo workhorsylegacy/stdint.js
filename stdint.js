@@ -24,33 +24,11 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 */
 
-const size_of_s8 = Int8Array.BYTES_PER_ELEMENT;
-const size_of_s16 = Int16Array.BYTES_PER_ELEMENT;
-const size_of_s32 = Int32Array.BYTES_PER_ELEMENT;
-
-const size_of_u8 = Uint8Array.BYTES_PER_ELEMENT;
-const size_of_u16 = Uint16Array.BYTES_PER_ELEMENT;
-const size_of_u32 = Uint32Array.BYTES_PER_ELEMENT;
-
-const max_s8 = Math.pow(2, (size_of_s8 * 8) - 1) - 1;
-const max_s16 = Math.pow(2, (size_of_s16 * 8) - 1) - 1;
-const max_s32 = Math.pow(2, (size_of_s32 * 8) - 1) - 1;
-
-const max_u8 = Math.pow(2, (size_of_u8 * 8)) - 1;
-const max_u16 = Math.pow(2, (size_of_u16 * 8)) - 1;
-const max_u32 = Math.pow(2, (size_of_u32 * 8)) - 1;
-
-const min_s8 = -Math.pow(2, (size_of_s8 * 8) - 1);
-const min_s16 = -Math.pow(2, (size_of_s16 * 8) - 1);
-const min_s32 = -Math.pow(2, (size_of_s32 * 8) - 1);
-
-const min_u8 = 0;
-const min_u16 = 0;
-const min_u32 = 0;
-
 var HEAP_SIZE = 1024 * 1024;
 var heap_counter = 0;
 var scope_counter = 0;
+var id_to_name = {};
+var name_to_id = {};
 var gheap;
 
 var s8;
@@ -61,90 +39,94 @@ var u8;
 var u16;
 var u32;
 
-function U8_Heap() {
-	this.heap = new Uint8Array(gheap);
-	this.id_to_name = {};
+U8_Heap = define_heap(
+	Uint8Array,
+	0,
+	Math.pow(2, (1 * 8)) - 1
+);
 
-	Object.defineProperty(this, 'size', {
-		get: function() {
-			return 1;
-		}
-	});
+U16_Heap = define_heap(
+	Uint16Array,
+	0,
+	Math.pow(2, (2 * 8)) - 1
+);
 
-	Object.defineProperty(this, 'min', {
-		get: function() {
-			return 0;
-		}
-	});
+U32_Heap = define_heap(
+	Uint32Array,
+	0,
+	Math.pow(2, (4 * 8)) - 1
+);
 
-	Object.defineProperty(this, 'max', {
-		get: function() {
-			return Math.pow(2, (size_of_u8 * 8)) - 1;
-		}
-	});
+S8_Heap = define_heap(
+	Int8Array,
+	-Math.pow(2, (1 * 8) - 1),
+	Math.pow(2, (1 * 8) - 1) - 1
+);
+
+S16_Heap = define_heap(
+	Int16Array,
+	-Math.pow(2, (2 * 8) - 1),
+	Math.pow(2, (2 * 8) - 1) - 1
+);
+
+S32_Heap = define_heap(
+	Int32Array,
+	-Math.pow(2, (4 * 8) - 1),
+	Math.pow(2, (4 * 8) - 1) - 1
+);
+
+function define_heap(typed_array, min_val, max_val) {
+	return function() {
+		this.heap = new typed_array(gheap);
+
+		Object.defineProperties(this, {
+			size: { get: function() { return typed_array.BYTES_PER_ELEMENT; } },
+			min: { get: function() { return min_val; } },
+			max: { get: function() { return max_val; } },
+			raw: { get: function() { return this.heap; } }
+		});
+
+		this.create = function(name, value) {
+			var id = malloc(this, name, value);
+
+			Object.defineProperty(this, name, {
+				configurable : true,
+				get: function() { return this.heap[id]; },
+				set: function(val) { this.heap[id] = val; }
+			});
+		};
+	}
 }
 
-U8_Heap.prototype.create = function(name, value) {
-	//FIXME: Throw if the name is already used or a reserved word.
-
-	var id = heap_counter;
-	heap_counter += this.size;
-	scope_counter += this.size;
-	this.heap[id] = value !== 'undefined' ? value : 0;
-	this.id_to_name[id] = name;
-
-	Object.defineProperty(this, name, {
-		configurable : true,
-
-		get: function() {
-			return this.heap[id];
-		},
-
-		set: function(val) {
-			this.heap[id] = val;
-		}
-	});
-};
-
-function reset_heap() {
+function reset_stdint() {
 	heap_counter = 0;
 	scope_counter = 0;
+	id_to_name = {};
+	name_to_id = {};
 
 	gheap = new ArrayBuffer(HEAP_SIZE);
 
-	s8 = new Int8Array(gheap);
-	s16 = new Int16Array(gheap);
-	s32 = new Int32Array(gheap);
+	u8 = new U8_Heap();
+	u16 = new U16_Heap();
+	u32 = new U32_Heap();
 
-	u8 = new Uint8Array(gheap);
-	u16 = new Uint16Array(gheap);
-	u32 = new Uint32Array(gheap);
+	s8 = new S8_Heap();
+	s16 = new S16_Heap();
+	s32 = new S32_Heap();
 }
 
-function malloc(array, size, value) {
+function malloc(type, name, value) {
 	// FIXME: If the heap is too small, the size should be increased.
+	// FIXME: Throw if the name is already used or a reserved word.
+
 	var id = heap_counter;
-	heap_counter += size;
-	scope_counter += size;
-	array[id] = value !== 'undefined' ? value : 0;
+	heap_counter += type.size;
+	scope_counter += type.size;
+	type.heap[id] = value !== 'undefined' ? value : 0;
+	id_to_name[id] = name;
+	name_to_id[name] = id;
 	return id;
 }
-
-// Converts an integer to a u8, u16, u32 et cetera
-function to_s8(value) { return new_s8(value); }
-function to_s16(value) { return new_s16(value); }
-function to_s32(value) { return new_s32(value); }
-function to_u8(value) { return new_u8(value); }
-function to_u16(value) { return new_u16(value); }
-function to_u32(value) { return new_u32(value); }
-
-// Returns a new index that can be used to access a variable on the heap
-function new_s8(value) { return malloc(s8, size_of_s8, value); }
-function new_s16(value) { return malloc(s16, size_of_s16, value); }
-function new_s32(value) { return malloc(s32, size_of_s32, value); }
-function new_u8(value) { return malloc(u8, size_of_u8, value); }
-function new_u16(value) { return malloc(u16, size_of_u16, value); }
-function new_u32(value) { return malloc(u32, size_of_u32, value); }
 
 // Removes any variables from the heap that were declared since the current scope started.
 // Also set their values to zero.
@@ -154,7 +136,14 @@ function clean_heap() {
 	while(scope_counter > 0) {
 		--heap_counter;
 		--scope_counter;
-		u8[heap_counter] = 0;
+
+		var id = heap_counter;
+		var name = id_to_name[id];
+
+		delete id_to_name[id];
+		delete name_to_id[name];
+
+		u8.heap[id] = 0;
 	}
 }
 
@@ -170,5 +159,5 @@ function uses_stdint(func) {
 	}
 }
 
-reset_heap();
+reset_stdint();
 
