@@ -24,6 +24,21 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 */
 
+/*
+TODO:
+. Look up best way to handle AUTHORS. EG "Copyright stdint.js authors"
+. Look up best way to handle private functions
+. Look up best way to handle globals in libraries
+. Look up best way to handle presenting messages to developers when ArrayBuffer is not supported. EG 
+Alert message, console message, exceptions, et cerera.
+. Add a check for browsers that use Int16Array, ArrayBuffer, and Object.defineProperties
+. Move the example to the example directory
+. Replace any bad words
+. Fix bug with heap cleaning various sizes
+. Fix bug with heap resizing
+. Make jslint and co happy
+*/
+
 var HEAP_SIZE = 1024 * 1024;
 var heap_counter = 0;
 var scope_counter = 0;
@@ -39,43 +54,7 @@ var u8;
 var u16;
 var u32;
 
-U8_Heap = define_heap(
-	Uint8Array,
-	0,
-	Math.pow(2, (1 * 8)) - 1
-);
-
-U16_Heap = define_heap(
-	Uint16Array,
-	0,
-	Math.pow(2, (2 * 8)) - 1
-);
-
-U32_Heap = define_heap(
-	Uint32Array,
-	0,
-	Math.pow(2, (4 * 8)) - 1
-);
-
-S8_Heap = define_heap(
-	Int8Array,
-	-Math.pow(2, (1 * 8) - 1),
-	Math.pow(2, (1 * 8) - 1) - 1
-);
-
-S16_Heap = define_heap(
-	Int16Array,
-	-Math.pow(2, (2 * 8) - 1),
-	Math.pow(2, (2 * 8) - 1) - 1
-);
-
-S32_Heap = define_heap(
-	Int32Array,
-	-Math.pow(2, (4 * 8) - 1),
-	Math.pow(2, (4 * 8) - 1) - 1
-);
-
-function define_heap(typed_array, min_val, max_val) {
+function _define_heap(typed_array, min_val, max_val) {
 	return function() {
 		this.heap = new typed_array(gheap);
 
@@ -87,7 +66,7 @@ function define_heap(typed_array, min_val, max_val) {
 		});
 
 		this.create = function(name, value) {
-			var id = malloc(this, name, value);
+			var id = _malloc(this, name, value);
 
 			Object.defineProperty(this, name, {
 				configurable : true,
@@ -98,24 +77,7 @@ function define_heap(typed_array, min_val, max_val) {
 	}
 }
 
-function reset_stdint() {
-	heap_counter = 0;
-	scope_counter = 0;
-	id_to_name = {};
-	name_to_id = {};
-
-	gheap = new ArrayBuffer(HEAP_SIZE);
-
-	u8 = new U8_Heap();
-	u16 = new U16_Heap();
-	u32 = new U32_Heap();
-
-	s8 = new S8_Heap();
-	s16 = new S16_Heap();
-	s32 = new S32_Heap();
-}
-
-function malloc(type, name, value) {
+function _malloc(type, name, value) {
 	// FIXME: If the heap is too small, the size should be increased.
 	// FIXME: Throw if the name is already used or a reserved word.
 
@@ -131,7 +93,7 @@ function malloc(type, name, value) {
 // Removes any variables from the heap that were declared since the current scope started.
 // Also set their values to zero.
 // FIXME: This may break if called in an unexpected order, such as from a timeout or interval.
-function clean_heap() {
+function _clean_heap() {
 	//console.log('Cleaning heap');
 	while(scope_counter > 0) {
 		--heap_counter;
@@ -147,6 +109,52 @@ function clean_heap() {
 	}
 }
 
+function reset_stdint() {
+	// Reset the variables that track the heap
+	heap_counter = 0;
+	scope_counter = 0;
+	id_to_name = {};
+	name_to_id = {};
+	gheap = new ArrayBuffer(HEAP_SIZE);
+
+	// Create the 8, 16, and 32 bit integer types
+	u8 = new (_define_heap(
+		Uint8Array,
+		0,
+		Math.pow(2, (1 * 8)) - 1
+	))();
+
+	u16 = new (_define_heap(
+		Uint16Array,
+		0,
+		Math.pow(2, (2 * 8)) - 1
+	))();
+
+	u32 = new (_define_heap(
+		Uint32Array,
+		0,
+		Math.pow(2, (4 * 8)) - 1
+	))();
+
+	s8 = new (_define_heap(
+		Int8Array,
+		-Math.pow(2, (1 * 8) - 1),
+		Math.pow(2, (1 * 8) - 1) - 1
+	))();
+
+	s16 = new (_define_heap(
+		Int16Array,
+		-Math.pow(2, (2 * 8) - 1),
+		Math.pow(2, (2 * 8) - 1) - 1
+	))();
+
+	s32 = new (_define_heap(
+		Int32Array,
+		-Math.pow(2, (4 * 8) - 1),
+		Math.pow(2, (4 * 8) - 1) - 1
+	))();
+}
+
 // Returns a new function that calls the original, then cleans the heap when it exits.
 // It uses a try/finally block for a scope guard.
 function uses_stdint(func) {
@@ -154,7 +162,7 @@ function uses_stdint(func) {
 		try {
 			return func.apply(this, arguments);
 		} finally {
-			clean_heap();
+			_clean_heap();
 		}
 	}
 }
