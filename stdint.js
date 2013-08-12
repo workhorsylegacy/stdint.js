@@ -27,14 +27,12 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 /*
 TODO:
 . Look up best way to handle AUTHORS. EG "Copyright stdint.js authors"
-. Look up best way to handle private functions
 . Look up best way to handle globals in libraries
 . Look up best way to handle presenting messages to developers when ArrayBuffer is not supported. EG 
 Alert message, console message, exceptions, et cerera.
 . Add a check for browsers that use Int16Array, ArrayBuffer, and Object.defineProperties
 . Fix bug with heap cleaning various sizes
 . Fix bug with heap resizing
-. Make jslint and co happy
 */
 
 var HEAP_SIZE = 1024 * 1024;
@@ -93,12 +91,15 @@ function _malloc(type, name, value) {
 // FIXME: This may break if called in an unexpected order, such as from a timeout or interval.
 function _clean_heap() {
 	//console.log('Cleaning heap');
-	while(scope_counter > 0) {
+	var id;
+	var name;
+
+	while (scope_counter > 0) {
 		--heap_counter;
 		--scope_counter;
 
-		var id = heap_counter;
-		var name = id_to_name[id];
+		id = heap_counter;
+		name = id_to_name[id];
 
 		delete id_to_name[id];
 		delete name_to_id[name];
@@ -162,7 +163,7 @@ function uses_stdint(func) {
 		} finally {
 			_clean_heap();
 		}
-	}
+	};
 }
 
 reset_stdint();
