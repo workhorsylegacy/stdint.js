@@ -1,7 +1,8 @@
 /*
-Copyright (c) 2013, Matthew Brennan Jones <mattjones@workhorsy.org>
-Stdint.js is a JavaScript library for various fixed width integer types.
-For more information see https://github.com/workhorsy/stdint.js
+Stdint.js - A JavaScript library for 8, 16, and 32 bit integer types.
+
+Copyright 2013 Stdint.js authors
+https://github.com/workhorsy/stdint.js
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
@@ -26,7 +27,6 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /*
 TODO:
-. Look up best way to handle AUTHORS. EG "Copyright stdint.js authors"
 . Look up best way to handle globals in libraries
 . Look up best way to handle presenting messages to developers when ArrayBuffer is not supported. EG 
 Alert message, console message, exceptions, et cerera.

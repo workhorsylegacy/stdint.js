@@ -1,7 +1,7 @@
 stdint.js
 =========
 
-A JavaScript library for various fixed width integer types. All types are stored on a pre allocated heap.
+A JavaScript library for 8, 16, and 32 bit integer types. All types are stored on a pre allocated heap.
 
 The following types are supported:
 
