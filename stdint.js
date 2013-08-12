@@ -27,9 +27,6 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /*
 TODO:
-. Look up best way to handle presenting messages to developers when ArrayBuffer is not supported. EG 
-Alert message, console message, exceptions, et cerera.
-. Add a check for browsers that use Int16Array, ArrayBuffer, and Object.defineProperties
 . Fix bug with heap cleaning various sizes
 . Fix bug with heap resizing
 */
@@ -48,6 +45,24 @@ var s32;
 var u8;
 var u16;
 var u32;
+
+// Make sure features are supported by the browser
+var features = {
+	'Object.defineProperties' : Object.defineProperties,
+	'ArrayBuffer' : typeof(ArrayBuffer),
+	'Uint8Array' : typeof(Uint8Array),
+	'Uint16Array' : typeof(Uint16Array),
+	'Uint32Array' : typeof(Uint32Array),
+	'Int8Array' : typeof(Int8Array),
+	'Int16Array' : typeof(Int16Array),
+	'Int32Array' : typeof(Int32Array)
+};
+for (var key in features) {
+	var value = features[key];
+	if (value === 'undefined') {
+		throw new Error(key + ' is not supported.');
+	}
+}
 
 function _define_heap(typed_array, min_val, max_val) {
 	return function() {
