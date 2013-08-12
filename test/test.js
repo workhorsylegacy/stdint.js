@@ -176,20 +176,20 @@ test( "heap cleanup", function() {
 		// Make sure the id is correct
 		u8.create('a');
 		u8.a = 4;
-		equal(name_to_id['a'], 0);
+		equal(gname_to_id['a'], 0);
 
 		// Make sure the id is correct
 		u8.create('b');
 		u8.b = 5;
-		equal(name_to_id['b'], 1);
+		equal(gname_to_id['b'], 1);
 
 		// Make sure the values are on the heap
 		equal(u8.raw[0], 4);
 		equal(u8.raw[1], 5);
 
 		// Make sure the heap counter is correct
-		equal(heap_counter, 2);
-		equal(scope_counter, 2);
+		equal(gheap_counter, 2);
+		equal(gscope_counter, 2);
 	});
 
 	// Actually call the function
@@ -200,8 +200,8 @@ test( "heap cleanup", function() {
 	equal(u8.raw[1], 0);
 
 	// Make sure the heap counter is correct
-	equal(heap_counter, 0);
-	equal(scope_counter, 0);
+	equal(gheap_counter, 0);
+	equal(gscope_counter, 0);
 });
 
 test( "default value", function() {

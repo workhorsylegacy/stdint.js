@@ -27,7 +27,6 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /*
 TODO:
-. Look up best way to handle globals in libraries
 . Look up best way to handle presenting messages to developers when ArrayBuffer is not supported. EG 
 Alert message, console message, exceptions, et cerera.
 . Add a check for browsers that use Int16Array, ArrayBuffer, and Object.defineProperties
@@ -36,10 +35,10 @@ Alert message, console message, exceptions, et cerera.
 */
 
 var HEAP_SIZE = 1024 * 1024;
-var heap_counter = 0;
-var scope_counter = 0;
-var id_to_name = {};
-var name_to_id = {};
+var gheap_counter = 0;
+var gscope_counter = 0;
+var gid_to_name = {};
+var gname_to_id = {};
 var gheap;
 
 var s8;
@@ -77,12 +76,12 @@ function _malloc(type, name, value) {
 	// FIXME: If the heap is too small, the size should be increased.
 	// FIXME: Throw if the name is already used or a reserved word.
 
-	var id = heap_counter;
-	heap_counter += type.size;
-	scope_counter += type.size;
+	var id = gheap_counter;
+	gheap_counter += type.size;
+	gscope_counter += type.size;
 	type.heap[id] = value !== 'undefined' ? value : 0;
-	id_to_name[id] = name;
-	name_to_id[name] = id;
+	gid_to_name[id] = name;
+	gname_to_id[name] = id;
 	return id;
 }
 
@@ -94,15 +93,15 @@ function _clean_heap() {
 	var id;
 	var name;
 
-	while (scope_counter > 0) {
-		--heap_counter;
-		--scope_counter;
+	while (gscope_counter > 0) {
+		--gheap_counter;
+		--gscope_counter;
 
-		id = heap_counter;
-		name = id_to_name[id];
+		id = gheap_counter;
+		name = gid_to_name[id];
 
-		delete id_to_name[id];
-		delete name_to_id[name];
+		delete gid_to_name[id];
+		delete gname_to_id[name];
 
 		u8.heap[id] = 0;
 	}
@@ -110,10 +109,10 @@ function _clean_heap() {
 
 function reset_stdint() {
 	// Reset the variables that track the heap
-	heap_counter = 0;
-	scope_counter = 0;
-	id_to_name = {};
-	name_to_id = {};
+	gheap_counter = 0;
+	gscope_counter = 0;
+	gid_to_name = {};
+	gname_to_id = {};
 	gheap = new ArrayBuffer(HEAP_SIZE);
 
 	// Create the 8, 16, and 32 bit integer types
