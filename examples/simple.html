@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" >
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<title>stdint.js</title>
+		<script type="text/javascript" src="../stdint.js"></script>
+	</head>
+
+	<body>
+		Putting 300 into an unsigned 8 bit int will give you
+		<label id="message"></label>
+		<script type="text/javascript" language="JavaScript">
+// Put 300 into a u8
+u8.create('result');
+u8.result = 300;
+
+// Print it into the html
+var message = document.getElementById('message');
+message.innerHTML = u8.result;
+		</script>
+	</body>
+</html>

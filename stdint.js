@@ -32,8 +32,6 @@ TODO:
 . Look up best way to handle presenting messages to developers when ArrayBuffer is not supported. EG 
 Alert message, console message, exceptions, et cerera.
 . Add a check for browsers that use Int16Array, ArrayBuffer, and Object.defineProperties
-. Move the example to the example directory
-. Replace any bad words
 . Fix bug with heap cleaning various sizes
 . Fix bug with heap resizing
 . Make jslint and co happy

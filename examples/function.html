@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" >
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<title>stdint.js</title>
+		<script type="text/javascript" src="../stdint.js"></script>
+	</head>
+
+	<body>
+		<button id="run">Run example</button>
+		<script type="text/javascript" language="JavaScript">
+var run = document.getElementById('run');
+
+run.onclick = uses_stdint(function() {
+	s32.create('a');
+	s32.a = 12345;
+
+	alert('a:' + s32.a);
+});
+		</script>
+	</body>
+</html>
