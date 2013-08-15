@@ -45,20 +45,20 @@ test( "u8", function() {
 	equal( u8.a, 0, "Default value");
 
 	// Assignment
-	u8.create('a', 77);
-	equal( u8.a, 77, "Assignment");
+	u8.create('b', 77);
+	equal( u8.b, 77, "Assignment");
 
 	// Max
-	u8.create('a', 255);
-	equal( u8.a, 255, "Max");
+	u8.create('c', 255);
+	equal( u8.c, 255, "Max");
 
 	// Overflow
-	u8.a += 10;
-	equal( u8.a, 9, "Overflow");
+	u8.c += 10;
+	equal( u8.c, 9, "Overflow");
 
 	// Negative
-	u8.a = -40;
-	equal( u8.a, u8.max-39, "Negative");
+	u8.c = -40;
+	equal( u8.c, u8.max-39, "Negative");
 });
 
 test( "u16", function() {
@@ -234,9 +234,38 @@ test( "casting", function() {
 	equal(u32.b, 7);
 
 	// u32 to u8 should truncate
-	u32.create('a', 300);
-	u8.create('b', u32.a);
-	equal(u32.a, 300);
-	equal(u8.b, 44);
+	u32.create('c', 300);
+	u8.create('d', u32.c);
+	equal(u32.c, 300);
+	equal(u8.d, 44);
+});
+
+test( "don't allow shadow declarations", function() {
+	// Create a u8
+	u8.create('example');
+
+	// Create a u32 with the same name
+	raises(
+		function(){
+			u32.create('example');
+		},
+		function(err) {
+			return err.message === "The name 'example' is already used.";
+		}
+	);
+	
+});
+
+test( "don't allow reserved words", function() {
+	raises(
+		function(){
+			// Create a u32 with a reserved word
+			u32.create('size');
+		},
+		function(err) {
+			return err.message === "The name 'size' is a reserved word.";
+		}
+	);
+	
 });
 

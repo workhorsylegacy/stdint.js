@@ -31,6 +31,7 @@ TODO:
 . Fix bug with heap resizing
 */
 
+var RESERVED_WORDS = ['create', 'heap', 'size', 'min', 'max', 'raw'];
 var HEAP_SIZE = 1024 * 1024;
 var gheap_counter = 0;
 var gscope_counter = 0;
@@ -89,7 +90,16 @@ function _define_heap(typed_array, min_val, max_val) {
 
 function _malloc(type, name, value) {
 	// FIXME: If the heap is too small, the size should be increased.
-	// FIXME: Throw if the name is already used or a reserved word.
+
+	// Don't allow already used words
+	if (name in gname_to_id) {
+		throw new Error("The name '" + name + "' is already used.");
+	}
+
+	// Don't allow reserved words
+	if (RESERVED_WORDS.indexOf(name) !== -1) {
+		throw new Error("The name '" + name + "' is a reserved word.");
+	}
 
 	var id = gheap_counter;
 	gheap_counter += type.size;
